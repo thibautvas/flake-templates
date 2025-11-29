@@ -10,3 +10,9 @@ dependencies = [
     "seaborn>=0.13.2",
     "statsmodels>=0.14.5",
 ]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.1.0",
+    "jupyter>=1.1.1",
+]
