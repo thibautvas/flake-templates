@@ -13,7 +13,14 @@
     │   └── flake.nix
     ├── packages
     │   └── flake.nix
-    └── python
+    ├── python
+    │   ├── .gitignore
+    │   ├── flake.lock
+    │   ├── flake.nix
+    │   ├── pyproject.toml
+    │   ├── README.md
+    │   └── uv.lock
+    └── python-ds
         ├── .gitignore
         ├── flake.lock
         ├── flake.nix
@@ -21,5 +28,5 @@
         ├── README.md
         └── uv.lock
 
-5 directories, 12 files
+6 directories, 18 files
 ```

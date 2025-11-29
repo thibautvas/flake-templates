@@ -23,6 +23,7 @@
           "devshells"
           "packages"
           "python"
+          "python-ds"
         ] mkTemplate;
     };
 }
