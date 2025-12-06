@@ -13,10 +13,12 @@
 ```text
 .
 ├── .gitignore
+├── README.md
 ├── flake.lock
 ├── flake.nix
-├── README.md
 └── templates
+    ├── default
+    │   └── flake.nix
     ├── devshells
     │   └── flake.nix
     ├── packages
@@ -36,5 +38,5 @@
         ├── README.md
         └── uv.lock
 
-6 directories, 18 files
+7 directories, 19 files
 ```

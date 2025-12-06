@@ -20,6 +20,7 @@
 
       in
         lib.genAttrs [
+          "default"
           "devshells"
           "packages"
           "python"
