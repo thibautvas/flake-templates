@@ -9,34 +9,36 @@
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
 
-    in
-    {
-      devShells = forAllSystems (
+      mkPackage =
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          default = pkgs.mkShell {
-            name = "dev";
-            packages = [ pkgs.hello ];
-          };
-        }
-      );
+          name = "template";
 
-      packages = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
         in
-        {
-          default = pkgs.writeShellApplication {
-            name = "package";
+        rec {
+          pack = pkgs.writeShellApplication {
+            inherit name;
             runtimeInputs = [ pkgs.hello ];
             text = ''
+              hello -t
             '';
           };
-        }
-      );
+
+          dev = pkgs.mkShell {
+            inherit name;
+            packages = [ pack ];
+          };
+        };
+
+    in
+    {
+      devShells = forAllSystems (system: {
+        default = (mkPackage system).dev;
+      });
+
+      packages = forAllSystems (system: {
+        default = (mkPackage system).pack;
+      });
     };
 }
