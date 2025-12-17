@@ -1,5 +1,5 @@
 {
-  description = "nix devshells and packages";
+  description = "nix devshells and apps";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -9,36 +9,36 @@
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
 
-      mkPackage =
+      mkDefApp =
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          name = "template";
-
-        in
-        rec {
-          pack = pkgs.writeShellApplication {
+          name = "hello-world";
+          shellApp = pkgs.writeShellApplication {
             inherit name;
             runtimeInputs = [ pkgs.hello ];
             text = ''
               hello -t
             '';
           };
-
-          dev = pkgs.mkShell {
-            inherit name;
-            packages = [ pack ];
+        in
+        {
+          app = {
+            type = "app";
+            program = "${shellApp}/bin/${name}";
+          };
+          devShell = pkgs.mkShell {
+            packages = [ shellApp ];
           };
         };
 
     in
     {
-      devShells = forAllSystems (system: {
-        default = (mkPackage system).dev;
+      apps = forAllSystems (system: {
+        default = (mkDefApp system).app;
       });
-
-      packages = forAllSystems (system: {
-        default = (mkPackage system).pack;
+      devShells = forAllSystems (system: {
+        default = (mkDefApp system).devShell;
       });
     };
 }

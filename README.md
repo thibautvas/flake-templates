@@ -17,11 +17,11 @@
 ├── flake.lock
 ├── flake.nix
 └── templates
+    ├── apps
+    │   └── flake.nix
     ├── default
     │   └── flake.nix
     ├── devshells
-    │   └── flake.nix
-    ├── packages
     │   └── flake.nix
     ├── python
     │   ├── .gitignore

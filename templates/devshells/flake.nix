@@ -18,7 +18,6 @@
         in
         {
           default = pkgs.mkShell {
-            name = "dev";
             packages = [ pkgs.hello ];
           };
         }

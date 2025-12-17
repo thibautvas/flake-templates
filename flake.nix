@@ -21,8 +21,8 @@
       in
         lib.genAttrs [
           "default"
+          "apps"
           "devshells"
-          "packages"
           "python"
           "python-ds"
         ] mkTemplate;
