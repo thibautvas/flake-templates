@@ -5,21 +5,16 @@
 
   outputs =
     { self, nixpkgs }:
-    let
-      inherit (nixpkgs) lib;
-      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
-
-    in
     {
       templates =
-      let
-        mkTemplate = name: {
-          description = "flake template for ${name}";
-          path = ./templates/${name};
-        };
+        let
+          mkTemplate = name: {
+            description = "flake template for ${name}";
+            path = ./templates/${name};
+          };
 
-      in
-        lib.genAttrs [
+        in
+        nixpkgs.lib.genAttrs [
           "default"
           "apps"
           "devshells"

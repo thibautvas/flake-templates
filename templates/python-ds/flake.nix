@@ -51,10 +51,12 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          python = lib.head (pyproject-nix.lib.util.filterPythonInterpreters {
-            inherit (workspace) requires-python;
-            inherit (pkgs) pythonInterpreters;
-          });
+          python = lib.head (
+            pyproject-nix.lib.util.filterPythonInterpreters {
+              inherit (workspace) requires-python;
+              inherit (pkgs) pythonInterpreters;
+            }
+          );
         in
         (pkgs.callPackage pyproject-nix.build.packages {
           inherit python;
@@ -83,7 +85,6 @@
         in
         {
           default = pkgs.mkShell {
-            name = "uv2nix-dev";
             packages = [
               virtualenv
               pkgs.uv
