@@ -1,5 +1,5 @@
 {
-  description = "nix devshells and apps";
+  description = "nix apps and devshells";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -8,37 +8,53 @@
     let
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+      systemOutputs = forAllSystems mkOutputs;
 
-      mkDefApp =
+      mkApp = drv: {
+        type = "app";
+        program = lib.getExe drv;
+      };
+
+      mkOutputs =
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          name = "hello-world";
+
           shellApp = pkgs.writeShellApplication {
-            inherit name;
+            name = "hello-world";
             runtimeInputs = [ pkgs.hello ];
             text = ''
               hello -t
             '';
           };
+
+          shellApp' = pkgs.writeShellApplication {
+            name = "drbat";
+            runtimeInputs = with pkgs; [
+              fzf
+              bat
+            ];
+            text = ''
+              fzf --reverse --preview='bat --color=always {}'
+            '';
+          };
         in
         {
-          app = {
-            type = "app";
-            program = "${shellApp}/bin/${name}";
+          apps = {
+            default = mkApp shellApp;
+            alt = mkApp shellApp';
           };
           devShell = pkgs.mkShell {
-            packages = [ shellApp ];
+            packages = [
+              shellApp
+              shellApp'
+            ];
           };
         };
 
     in
     {
-      apps = forAllSystems (system: {
-        default = (mkDefApp system).app;
-      });
-      devShells = forAllSystems (system: {
-        default = (mkDefApp system).devShell;
-      });
+      apps = lib.mapAttrs (_: value: value.apps) systemOutputs;
+      devShells = lib.mapAttrs (_: value: { default = value.devShell; }) systemOutputs;
     };
 }
