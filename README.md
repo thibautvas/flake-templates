@@ -3,13 +3,15 @@
 ## Quick start
 
 ```bash
-nix flake init -t github:thibautvas/flake-templates#python
+nix flake init -t github:thibautvas/flake-templates
+# resp. #apps, #devshells, #python
 ```
 
-## Build python `.venv`
+## Build immutable python `.venv`
 
 ```bash
-nix build --out-link .venv github:thibautvas/flake-templates?dir=templates/python-ds
+nix build --out-link .venv github:thibautvas/flake-templates/ds?dir=templates/python
+# branch ds for data science packages
 ```
 
 ## Project structure
@@ -27,15 +29,7 @@ nix build --out-link .venv github:thibautvas/flake-templates?dir=templates/pytho
     │   └── flake.nix
     ├── devshells
     │   └── flake.nix
-    ├── python
-    │   ├── .gitignore
-    │   ├── README.md
-    │   ├── .envrc
-    │   ├── flake.lock
-    │   ├── flake.nix
-    │   ├── pyproject.toml
-    │   └── uv.lock
-    └── python-ds
+    └── python
         ├── .gitignore
         ├── README.md
         ├── .envrc
@@ -44,5 +38,5 @@ nix build --out-link .venv github:thibautvas/flake-templates?dir=templates/pytho
         ├── pyproject.toml
         └── uv.lock
 
-7 directories, 21 files
+6 directories, 14 files
 ```

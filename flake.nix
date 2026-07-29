@@ -19,7 +19,6 @@
           "apps"
           "devshells"
           "python"
-          "python-ds"
         ] mkTemplate;
     };
 }
