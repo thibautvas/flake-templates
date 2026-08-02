@@ -13,21 +13,17 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          name = "my-app";
           shellApp = pkgs.writeShellApplication {
-            inherit name;
-            runtimeInputs = with pkgs; [
-              fzf
-              chafa
-            ];
-            text = "";
+            name = "hello-world";
+            runtimeInputs = [ pkgs.hello ];
+            text = "hello -t";
           };
         in
         {
           packages.default = shellApp;
           apps.default = {
             type = "app";
-            program = "${shellApp}/bin/${name}";
+            program = "${shellApp}/bin/${shellApp.name}";
           };
           devShells.default = pkgs.mkShell {
             packages = [ shellApp ];
@@ -35,9 +31,7 @@
         };
 
     in
-    {
-      packages = forAllSystems (system: (perSystem system).packages);
-      apps = forAllSystems (system: (perSystem system).apps);
-      devShells = forAllSystems (system: (perSystem system).devShells);
-    };
+    lib.genAttrs [ "packages" "apps" "devShells" ] (
+      output: forAllSystems (system: (perSystem system).${output})
+    );
 }

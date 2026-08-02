@@ -15,23 +15,17 @@
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          shellApp = pkgs.writeShellApplication {
+            name = "hello-world";
+            runtimeInputs = [ pkgs.hello ];
+            text = "hello -t";
+          };
         in
         {
-          default =
-            let
-              name = "hello-world";
-              shellApp = pkgs.writeShellApplication {
-                inherit name;
-                runtimeInputs = [ pkgs.hello ];
-                text = ''
-                  hello -t
-                '';
-              };
-            in
-            {
-              type = "app";
-              program = "${shellApp}/bin/${name}";
-            };
+          default = {
+            type = "app";
+            program = "${shellApp}/bin/${shellApp.name}";
+          };
         }
       );
     };
