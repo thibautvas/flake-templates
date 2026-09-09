@@ -1,5 +1,5 @@
 {
-  description = "nix devshells";
+  description = "nix packages";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -19,13 +19,11 @@
           pack = pkgs.hello;
         in
         {
-          devShells.default = pkgs.mkShell {
-            packages = [ pack ];
-          };
+          packages.default = pack;
         };
 
     in
     {
-      devShells = forAllSystems (system: (perSystem system).devShells);
+      packages = forAllSystems (system: (perSystem system).packages);
     };
 }

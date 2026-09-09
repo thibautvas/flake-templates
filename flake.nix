@@ -5,20 +5,25 @@
 
   outputs =
     { self, nixpkgs }:
+    let
+      inherit (nixpkgs) lib;
+
+      mkTemplate = name: {
+        description = "flake template for ${name}";
+        path = ./templates/${name};
+      };
+
+    in
     {
       templates =
-        let
-          mkTemplate = name: {
-            description = "flake template for ${name}";
-            path = ./templates/${name};
-          };
-
-        in
-        nixpkgs.lib.genAttrs [
-          "default"
+        lib.genAttrs [
           "apps"
           "devshells"
+          "packages"
           "python"
-        ] mkTemplate;
+        ] mkTemplate
+        // {
+          default = self.templates.packages;
+        };
     };
 }

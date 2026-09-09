@@ -7,26 +7,28 @@
     { self, nixpkgs }:
     let
       inherit (nixpkgs) lib;
-      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+      forAllSystems = lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
 
-    in
-    {
-      apps = forAllSystems (
+      perSystem =
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          shellApp = pkgs.writeShellApplication {
-            name = "hello-world";
-            runtimeInputs = [ pkgs.hello ];
-            text = "hello -t";
-          };
+          pack = pkgs.hello;
         in
         {
-          default = {
+          packages.default = pack;
+          apps.default = {
             type = "app";
-            program = "${shellApp}/bin/${shellApp.name}";
+            program = "${pack}/bin/${pack.pname}";
           };
-        }
-      );
+        };
+
+    in
+    {
+      packages = forAllSystems (system: (perSystem system).packages);
+      apps = forAllSystems (system: (perSystem system).apps);
     };
 }
