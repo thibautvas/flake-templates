@@ -8,9 +8,4 @@ wheels/
 
 # Virtual environments
 .venv
-
-# Untracked
-input/
-output/
-legacy/
-share/
+result

@@ -33,7 +33,10 @@
     }:
     let
       inherit (nixpkgs) lib;
-      forAllSystems = lib.genAttrs lib.systems.flakeExposed;
+      forAllSystems = lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-darwin"
+      ];
 
       workspace = uv2nix.lib.workspace.loadWorkspace {
         workspaceRoot = ./.;
