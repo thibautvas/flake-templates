@@ -7,28 +7,17 @@
     { self, nixpkgs }:
     let
       inherit (nixpkgs) lib;
-      forAllSystems = lib.genAttrs [
-        "x86_64-linux"
-        "aarch64-darwin"
-      ];
+      system = "x86_64-linux";
+      pkgs = nixpkgs.legacyPackages.${system};
 
-      perSystem =
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          pack = pkgs.hello;
-        in
-        {
-          packages.default = pack;
-          apps.default = {
-            type = "app";
-            program = "${pack}/bin/${pack.pname}";
-          };
-        };
+      pack = pkgs.hello;
 
     in
     {
-      packages = forAllSystems (system: (perSystem system).packages);
-      apps = forAllSystems (system: (perSystem system).apps);
+      packages.${system}.default = pack;
+      apps.${system}.default = {
+        type = "app";
+        program = "${pack}/bin/${pack.pname}";
+      };
     };
 }
