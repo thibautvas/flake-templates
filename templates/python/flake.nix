@@ -1,36 +1,10 @@
 {
-  description = "python sandbox using uv2nix";
+  description = "python sandbox using nixpkgs";
 
-  inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    pyproject-nix = {
-      url = "github:pyproject-nix/pyproject.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    uv2nix = {
-      url = "github:pyproject-nix/uv2nix";
-      inputs.pyproject-nix.follows = "pyproject-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    pyproject-build-systems = {
-      url = "github:pyproject-nix/build-system-pkgs";
-      inputs.pyproject-nix.follows = "pyproject-nix";
-      inputs.uv2nix.follows = "uv2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-  };
+  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      pyproject-nix,
-      uv2nix,
-      pyproject-build-systems,
-    }:
+    { self, nixpkgs }:
     let
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs [
@@ -38,70 +12,27 @@
         "aarch64-darwin"
       ];
 
-      workspace = uv2nix.lib.workspace.loadWorkspace {
-        workspaceRoot = ./.;
-      };
-
-      overlay = workspace.mkPyprojectOverlay {
-        sourcePreference = "wheel";
-      };
-
-      editableOverlay = workspace.mkEditablePyprojectOverlay {
-        root = "$REPO_ROOT";
-      };
-
-      pythonSets = forAllSystems (
+      perSystem =
         system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
-          python = lib.head (
-            pyproject-nix.lib.util.filterPythonInterpreters {
-              inherit (workspace) requires-python;
-              inherit (pkgs) pythonInterpreters;
-            }
-          );
-        in
-        (pkgs.callPackage pyproject-nix.build.packages {
-          inherit python;
-        }).overrideScope
-          (
-            lib.composeManyExtensions [
-              pyproject-build-systems.overlays.wheel
-              overlay
+
+          python = pkgs.python3.withPackages (
+            ps: with ps; [
+              pandas
+              scikit-learn
+              seaborn
+              statsmodels
             ]
-          )
-      );
+          );
+
+        in
+        {
+          packages.default = python;
+        };
 
     in
     {
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-          pythonSet = pythonSets.${system}.overrideScope editableOverlay;
-          virtualenv = pythonSet.mkVirtualEnv "python-sandbox-dev" workspace.deps.all;
-        in
-        {
-          default = pkgs.mkShell {
-            packages = [
-              virtualenv
-              pkgs.uv
-            ];
-            env = {
-              UV_NO_SYNC = "1";
-              UV_PYTHON_DOWNLOADS = "never";
-              UV_PYTHON = pythonSet.python.interpreter;
-            };
-            shellHook = ''
-              unset PYTHONPATH
-              export REPO_ROOT=$(git rev-parse --show-toplevel)
-            '';
-          };
-        }
-      );
-
-      packages = forAllSystems (system: {
-        default = pythonSets.${system}.mkVirtualEnv "python-sandbox-env" workspace.deps.all;
-      });
+      packages = forAllSystems (system: (perSystem system).packages);
     };
 }
