@@ -3,8 +3,17 @@
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
+  inputs.python-template = {
+    url = "path:./templates/python";
+    inputs.nixpkgs.follows = "nixpkgs";
+  };
+
   outputs =
-    { self, nixpkgs }:
+    {
+      self,
+      nixpkgs,
+      python-template,
+    }:
     let
       inherit (nixpkgs) lib;
       forAllSystems = lib.genAttrs [
@@ -49,6 +58,10 @@
           apps = lib.genAttrs templateNames mkApp // {
             default = mkApp "packages";
           };
+
+          packages = {
+            venv = python-template.packages.${system}.default;
+          };
         };
 
     in
@@ -58,5 +71,7 @@
       };
 
       apps = forAllSystems (system: (perSystem system).apps);
+
+      packages = forAllSystems (system: (perSystem system).packages);
     };
 }
