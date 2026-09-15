@@ -7,9 +7,16 @@ nix flake init -t github:thibautvas/flake-templates
 # resp. #apps, #devshells, #python
 ```
 
-## Build immutable python `.venv`
+## Git and flake init
 
 ```bash
-nix build -o .venv github:thibautvas/flake-templates/ds?dir=templates/python
+nix run github:thibautvas/flake-templates
+# resp. #apps, #devshells, #python
+```
+
+## Special case: immutable python .venv
+
+```bash
+nix build github:thibautvas/flake-templates/ds#venv
 # branch ds for data science packages
 ```
