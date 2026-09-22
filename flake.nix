@@ -1,5 +1,5 @@
 {
-  description = "nix templates by thibautvas";
+  description = "flake templates by thibautvas";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 
@@ -33,7 +33,10 @@
                 runtimeInputs = [ pkgs.gitMinimal ];
                 text = ''
                   nix flake init -t "${self}#${name}"
-                  cp --update=none -v ${self}/flake.lock . # not pretty but keeps lockfile unique
+                  for item in flake.lock .gitignore; do
+                    cp --update=none -v ${self}/$item . # not pretty but keeps lockfile unique
+                    chmod 644 $item
+                  done
                   git init
                   git add -A
                   git commit -m init
